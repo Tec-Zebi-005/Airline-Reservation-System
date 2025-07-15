@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Status Tracker</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-image: url('images/subimg5.avif');
+            background-size: cover;
+            
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f4f4f9; 
+        }
+        h1 {
+            text-align: center;
+            color: #fff; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+        }
+        .search-container {
+            background-color: rgba(255, 255, 255, 0.9); 
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-container input {
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .search-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-container .search-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .search-container .search-btn:hover {
+            background-color: #0056b3;
+        }
+        .search-container .clear-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .search-container .clear-btn:hover {
+            background-color: #b02a37;
+        }
+        #status-result {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        #status-result.show {
+            display: block;
+        }
+        .status-field {
+            margin: 10px 0;
+        }
+        .status-field label {
+            font-weight: bold;
+            color: #333;
+        }
+        .status-on-time {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-delayed {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+        .status-cancelled {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .history-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .history-container h3 {
+            margin: 0 0 10px;
+            color: #333;
+            display: inline-block;
+        }
+        .history-container .clear-history-btn {
+            float: right;
+            padding: 5px 10px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .history-container .clear-history-btn:hover {
+            background-color: #5a6268;
+        }
+        .history-item {
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        .loader.show {
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .current-time {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Flight Status</h1>
+    <div class="search-container">
+        <input type="text" id="flightNumber" placeholder="Enter Flight Number (e.g., AA123)">
+        <button class="search-btn" onclick="checkFlightStatus()">Check Status</button>
+        <button class="clear-btn" onclick="clearInput()">Clear</button>
+    </div>
+    <div class="loader" id="loader"></div>
+    <div id="status-result">
+        <div class="status-field"><label>Flight Number:</label> <span id="flightNum"></span></div>
+        <div class="status-field"><label>Status:</label> <span id="flightStatus"></span></div>
+        <div class="status-field"><label>Departure:</label> <span id="departure"></span></div>
+        <div class="status-field"><label>Arrival:</label> <span id="arrival"></span></div>
+        <div class="status-field"><label>Gate:</label> <span id="gate"></span></div>
+    </div>
+    <p id="error-message" class="error"></p>
+    <div class="history-container">
+        <h3>Search History</h3>
+        <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+        <div id="searchHistory"></div>
+    </div>
+
+    <script>
+        // Mock flight data (simulating API response)
+        const flightData = {
+            "AA123": {
+                flightNumber: "AA123",
+                status: "On Time",
+                departure: "Pakistan, Islamabad - 10:30 AM",
+                arrival: "Turkey, Istanbul - 1:45 PM",
+                gate: "B12"
+            },
+            "AA1234": {
+                flightNumber: "AA1234",
+                status: "Delayed",
+                departure: "UAE, Dubai - 2:00 PM",
+                arrival: "Pakistan, Lahore - 5:30 PM",
+                gate: "C5"
+            },
+            "PK12345": {
+                flightNumber: "PK12345",
+                status: "Cancelled",
+                departure: "Pakistan, Karachi - 8:00 AM",
+                arrival: "USA, Chicago - 11:15 AM",
+                gate: "N/A"
+            },
+            "AA11": {
+                flightNumber: "AA11",
+                status: "On Time",
+                departure: "Pakistan, Lahore - 9:00 AM",
+                arrival: "UK, London - 2:30 PM",
+                gate: "A7"
+            },
+            "AA22": {
+                flightNumber: "AA22",
+                status: "Delayed",
+                departure: "Pakistan, Islamabad - 11:00 AM",
+                arrival: "Canada, Toronto - 6:00 PM",
+                gate: "D3"
+            }
+        };
+
+        // Load search history from localStorage
+        let searchHistory = JSON.parse(localStorage.getItem("flightSearchHistory")) || [];
+
+        function updateCurrentTime() {
+            const now = new Date("2025-05-28T22:02:00+05:00"); // Set to 10:02 PM PKT, May 28, 2025
+            const options = { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "Asia/Karachi" };
+            document.getElementById("currentTime").textContent = now.toLocaleTimeString("en-US", options);
+        }
+
+        // Update search history display
+        function updateSearchHistory() {
+            const historyContainer = document.getElementById("searchHistory");
+            historyContainer.innerHTML = "";
+            searchHistory.forEach(flightNum => {
+                const div = document.createElement("div");
+                div.className = "history-item";
+                div.textContent = flightNum;
+                div.onclick = () => {
+                    document.getElementById("flightNumber").value = flightNum;
+                    checkFlightStatus();
+                };
+                historyContainer.appendChild(div);
+            });
+        }
+
+        
+        function saveToHistory(flightNumber) {
+            if (!searchHistory.includes(flightNumber)) {
+                searchHistory.unshift(flightNumber); // Add to start of array
+                if (searchHistory.length > 5) searchHistory.pop(); // Limit to 5 entries
+                localStorage.setItem("flightSearchHistory", JSON.stringify(searchHistory));
+                updateSearchHistory();
+            }
+        }
+
+        // Clear input and reset form
+        function clearInput() {
+            document.getElementById("flightNumber").value = "";
+            document.getElementById("status-result").classList.remove("show");
+            document.getElementById("error-message").textContent = "";
+            document.getElementById("loader").classList.remove("show");
+        }
+
+        // Clear search history
+        function clearHistory() {
+            searchHistory = [];
+            localStorage.setItem("flightSearchHistory", JSON.stringify(searchHistory));
+            updateSearchHistory();
+        }
+
+        // Check flight status with simulated delay
+        function checkFlightStatus() {
+            const flightNumber = document.getElementById("flightNumber").value.toUpperCase();
+            const statusResult = document.getElementById("status-result");
+            const errorMessage = document.getElementById("error-message");
+            const loader = document.getElementById("loader");
+
+            
+            statusResult.classList.remove("show");
+            errorMessage.textContent = "";
+            loader.classList.add("show");
+
+            if (!flightNumber) {
+                setTimeout(() => {
+                    loader.classList.remove("show");
+                    errorMessage.textContent = "Please enter a valid flight number (e.g., AA123).";
+                }, 500);
+                return;
+            }
+
+           
+            setTimeout(() => {
+                loader.classList.remove("show");
+                if (flightData[flightNumber]) {
+                    const flight = flightData[flightNumber];
+                    document.getElementById("flightNum").textContent = flight.flightNumber;
+                    const statusSpan = document.getElementById("flightStatus");
+                    statusSpan.textContent = flight.status;
+                    statusSpan.className = "";
+                    if (flight.status === "On Time") statusSpan.classList.add("status-on-time");
+                    else if (flight.status === "Delayed") statusSpan.classList.add("status-delayed");
+                    else if (flight.status === "Cancelled") statusSpan.classList.add("status-cancelled");
+                    document.getElementById("departure").textContent = flight.departure;
+                    document.getElementById("arrival").textContent = flight.arrival;
+                    document.getElementById("gate").textContent = flight.gate;
+                    statusResult.classList.add("show");
+                    saveToHistory(flightNumber);
+                } else {
+                    errorMessage.textContent = `Flight ${flightNumber} not found. Try AA123, AA1234, PK12345, AA11, or AA22.`;
+                }
+            }, 1000); 
+        }
+
+        // Initialize page
+        updateCurrentTime();
+        updateSearchHistory();
+        setInterval(updateCurrentTime, 1000); 
+
+        // Allow pressing Enter to submit
+        document.getElementById("flightNumber").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkFlightStatus();
+            }
+        });
+    </script>
+</body>
+</html>

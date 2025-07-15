@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Us - Airline Reservation System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #646971 0%, #626b7b 100%);
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.4);
+  }
+
+  header h1 {
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin: 0;
+    font-size: 3rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+  }
+
+  main {
+    flex-grow: 1;
+    max-width: 900px;
+    margin: 3rem auto 4rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    padding: 3rem;
+    backdrop-filter: blur(10px);
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+  }
+
+  section h2 {
+    font-weight: 600;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    border-left: 6px solid #ffd700;
+    padding-left: 1rem;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+
+  section p {
+    font-weight: 300;
+    font-size: 1.15rem;
+    line-height: 1.7;
+  }
+
+  ul.values-list {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  ul.values-list li {
+    background: rgba(255, 255, 255, 0.12);
+    flex: 1 1 220px;
+    border-radius: 14px;
+    padding: 1.2rem 1.8rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    transition: background 0.5s ease, color 0.5s ease;
+    cursor: default;
+  }
+
+  ul.values-list li:hover {
+    background: #ffd700;
+    color: #1a1a1a;
+    box-shadow: 0 8px 22px #ffd700;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1.2rem 0;
+    font-size: 0.9rem;
+    color: rgba(240,240,240,0.7);
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  @media (max-width: 600px) {
+    header h1 {
+      font-size: 2.2rem;
+    }
+
+    main {
+      margin: 2rem 1rem 3rem;
+      padding: 2rem;
+    }
+
+    section h2 {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>About Us</h1>
+</header>
+<main>
+  <section>
+    <h2>Our Mission</h2>
+    <p>
+      To provide travelers with a seamless, efficient, and secure airline reservation experience that enables hassle-free journey planning worldwide.
+      We strive to connect people to their destinations with ease and confidence.
+    </p>
+  </section>
+
+  <section>
+    <h2>About Our System</h2>
+    <p>
+      Our Airline Reservation System leverages cutting-edge technology to deliver real-time flight information, availability, pricing, and booking capabilities. 
+      Designed with users in mind, it offers an intuitive interface letting customers easily search, compare, and book flights from multiple airlines in one place.
+    </p>
+  </section>
+
+  <section>
+    <h2>Core Values</h2>
+    <ul class="values-list">
+      <li>Reliability & Accuracy</li>
+      <li>User-Friendly Experience</li>
+      <li>Data Security & Privacy</li>
+      <li>24/7 Customer Support</li>
+      <li>Competitive Pricing</li>
+      <li>Innovation & Continuous Improvement</li>
+    </ul>
+  </section>
+  <section>
+  <h2>Our Team</h2>
+  <ul class="values-list">
+    <li><strong>Muhammad Shahzeb Qamar [Project Manager]</strong><br> Oversees project planning, ensures timely delivery, and coordinates team efforts.</li>
+    <li><strong>Saad Ali Bajwa [Lead Developer]</strong> <br>Implements core system logic, backend infrastructure, and API integrations.</li>
+    <li><strong>Daniyal Ahmed [UI/UX Designer]</strong><br> Designs the interface with user-friendly navigation and aesthetic appeal.</li>
+    <li><strong>Umar Farooq [QA Engineer]</strong> <br>Ensures quality through rigorous testing and performance evaluations.</li>
+    <li><strong>Ahtisham Khan [Support Specialist]</strong><br> Provides round-the-clock customer service and issue resolution.</li>
+  </ul>
+</section>
+</main>
+<footer>
+  &copy; 2025 Airline-X. All rights reserved.
+</footer>
+</body>
+</html>
+

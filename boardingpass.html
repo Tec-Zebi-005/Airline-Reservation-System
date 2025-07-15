@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="payement.html">
+    <title>Boarding Pass</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-image: url(images/subimg7.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        
+
+        h1,
+        .current-time {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            /* Improve readability */
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .form-container {
+            background-color: #f9afaf;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        .form-container input,
+        .form-container select {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+
+        }
+
+        .form-container button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .boarding-pass {
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+            border-left: 5px solid #007bff;
+        }
+
+        .boarding-pass.show {
+            display: block;
+        }
+
+        .boarding-pass h2 {
+            margin: 0 0 20px;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .boarding-pass .pass-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .boarding-pass .detail-item {
+            margin: 10px 0;
+        }
+
+        .boarding-pass .detail-item label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .boarding-pass .barcode {
+            text-align: center;
+            margin-top: 20px;
+            font-family: 'Libre Barcode 39', cursive;
+            font-size: 48px;
+        }
+
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .print-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .print-btn:hover {
+            background-color: #218838;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+
+            .form-container,
+            .error,
+            .print-btn {
+                display: none;
+            }
+
+            .boarding-pass {
+                display: block;
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Generate Boarding Pass</h1>
+    <div class="form-container">
+        <label for="passengerName">Passenger Name</label>
+        <input type="text" id="passengerName" placeholder="e.g., Ali">
+        <label for="flightNumber">Flight Number</label>
+        <input type="text" id="flightNumber" placeholder="e.g., AA123">
+        <label for="departure">Departure</label>
+        <input type="text" id="departure" placeholder="e.g., Islamabad, Pakistan">
+        <label for="destination">Destination</label>
+        <input type="text" id="destination" placeholder="e.g., Istanbul, Turkey">
+        <label for="date">Date</label>
+        <input type="date" id="date" value="2025-05-28">
+        <label for="time">Time</label>
+        <input type="time" id="time" value="22:12">
+        <label for="gate">Gate</label>
+        <input type="text" id="gate" placeholder="e.g., B12">
+        <label for="seat">Seat</label>
+        <input type="text" id="seat" placeholder="e.g., 12A">
+        <button onclick="generateBoardingPass()">Generate Boarding Pass</button>
+    </div>
+    <p id="error-message" class="error"></p>
+    <div class="boarding-pass" id="boardingPass">
+        <h2>Boarding Pass</h2>
+        <div class="pass-details">
+            <div class="detail-item"><label>Passenger:</label> <span id="passPassenger"></span></div>
+            <div class="detail-item"><label>Flight:</label> <span id="passFlight"></span></div>
+            <div class="detail-item"><label>From:</label> <span id="passDeparture"></span></div>
+            <div class="detail-item"><label>To:</label> <span id="passDestination"></span></div>
+            <div class="detail-item"><label>Date:</label> <span id="passDate"></span></div>
+            <div class="detail-item"><label>Time:</label> <span id="passTime"></span></div>
+            <div class="detail-item"><label>Gate:</label> <span id="passGate"></span></div>
+            <div class="detail-item"><label>Seat:</label> <span id="passSeat"></span></div>
+        </div>
+        <div class="barcode" id="barcode"></div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Print Boarding Pass</button>
+
+    <script>
+        function generateBoardingPass() {
+            const passengerName = document.getElementById("passengerName").value.trim();
+            const flightNumber = document.getElementById("flightNumber").value.trim().toUpperCase();
+            const departure = document.getElementById("departure").value.trim();
+            const destination = document.getElementById("destination").value.trim();
+            const date = document.getElementById("date").value;
+            const time = document.getElementById("time").value;
+            const gate = document.getElementById("gate").value.trim().toUpperCase();
+            const seat = document.getElementById("seat").value.trim().toUpperCase();
+            const errorMessage = document.getElementById("error-message");
+            const boardingPass = document.getElementById("boardingPass");
+
+            // Clear previous results
+            errorMessage.textContent = "";
+            boardingPass.classList.remove("show");
+
+            // Validate inputs
+            if (!passengerName || !flightNumber || !departure || !destination || !date || !time || !gate || !seat) {
+                errorMessage.textContent = "Please fill out all fields.";
+                return;
+            }
+
+            // Populate boarding pass
+            document.getElementById("passPassenger").textContent = passengerName;
+            document.getElementById("passFlight").textContent = flightNumber;
+            document.getElementById("passDeparture").textContent = departure;
+            document.getElementById("passDestination").textContent = destination;
+            document.getElementById("passDate").textContent = new Date(date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            });
+            document.getElementById("passTime").textContent = time;
+            document.getElementById("passGate").textContent = gate;
+            document.getElementById("passSeat").textContent = seat;
+            document.getElementById("barcode").textContent = flightNumber + seat; // Simple barcode simulation
+
+            boardingPass.classList.add("show");
+        }
+
+        // Allow Enter key to submit
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    generateBoardingPass();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
